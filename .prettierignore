@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+# Hand-authored prose and infra — formatted by their authors, not Prettier.
+*.md
+docs/
+infrastructure/
