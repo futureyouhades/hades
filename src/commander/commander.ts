@@ -1,4 +1,5 @@
 export class HadesCommander {
+
   constructor() {}
 
   public start(): void {
@@ -8,4 +9,9 @@ export class HadesCommander {
   public stop(): void {
     console.log("Hades Commander stopped.");
   }
+
+  public execute(command: string): void {
+    console.log(`Received command: ${command}`);
+  }
+
 }
