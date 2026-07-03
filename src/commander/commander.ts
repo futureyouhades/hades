@@ -15,8 +15,20 @@ export class HadesCommander {
     }
 
     public status(): void {
-        console.log("Commander status: READY");
-    }public analyze(command: string): void {
+    console.log("Commander status: READY");
+}
+
+public analyze(command: string): void {
+
+    if (command.includes("otwórz")) {
+        console.log("Action: OPEN");
+    } else if (command.includes("szukaj")) {
+        console.log("Action: SEARCH");
+    } else {
+        console.log("Action: UNKNOWN");
+    }
+
+}
 
     if (command.includes("otwórz")) {
         console.log("Action: OPEN");
