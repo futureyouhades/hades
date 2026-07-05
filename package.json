@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.107.0",
+    "@qdrant/js-client-rest": "^1.18.0",
     "ajv": "^8.17.1"
   },
   "devDependencies": {
