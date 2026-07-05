@@ -1,4 +1,8 @@
+import { HadesRouter } from "../router";
+
 export class HadesCommander {
+
+    private router = new HadesRouter();
 
     constructor() {}
 
@@ -14,37 +18,25 @@ export class HadesCommander {
         console.log(`Received command: ${command}`);
     }
 
+    public analyze(command: string): void {
+
+        if (command.includes("otwórz")) {
+            this.router.route("OPEN");
+        }
+        else if (command.includes("szukaj")) {
+            this.router.route("SEARCH");
+        }
+        else if (command.includes("pamięć")) {
+            this.router.route("MEMORY");
+        }
+        else {
+            this.router.route("UNKNOWN");
+        }
+
+    }
+
     public status(): void {
-    console.log("Commander status: READY");
-}
-
-public analyze(command: string): void {
-
-    if (command.includes("otwórz")) {
-        console.log("Action: OPEN");
-    } else if (command.includes("szukaj")) {
-        console.log("Action: SEARCH");
-    } else {
-        console.log("Action: UNKNOWN");
+        console.log("Commander status: READY");
     }
 
-}
-
-    if (command.includes("otwórz")) {
-        console.log("Action: OPEN");
-    }
-
-    else if (command.includes("szukaj")) {
-        console.log("Action: SEARCH");
-    }
-
-    else if (command.includes("zapamiętaj")) {
-        console.log("Action: MEMORY");
-    }
-
-    else {
-        console.log("Action: UNKNOWN");
-    }
-
-}
 }
