@@ -1,42 +1,17 @@
-import { HadesRouter } from "../router";
+import { askHades } from "../hades/brain";
 
 export class HadesCommander {
+  async execute(input: string): Promise<string> {
 
-    private router = new HadesRouter();
+    const command = input.toLowerCase();
 
-    constructor() {}
-
-    public start(): void {
-        console.log("Hades Commander started.");
+    if (
+      command.includes("jak masz na imię") ||
+      command.includes("kim jesteś")
+    ) {
+      return await askHades("Przedstaw się jako Hades.");
     }
 
-    public stop(): void {
-        console.log("Hades Commander stopped.");
-    }
-
-    public execute(command: string): void {
-        console.log(`Received command: ${command}`);
-    }
-
-    public analyze(command: string): void {
-
-        if (command.includes("otwórz")) {
-            this.router.route("OPEN");
-        }
-        else if (command.includes("szukaj")) {
-            this.router.route("SEARCH");
-        }
-        else if (command.includes("pamięć")) {
-            this.router.route("MEMORY");
-        }
-        else {
-            this.router.route("UNKNOWN");
-        }
-
-    }
-
-    public status(): void {
-        console.log("Commander status: READY");
-    }
-
+    return await askHades(input);
+  }
 }

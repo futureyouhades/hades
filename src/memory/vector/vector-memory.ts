@@ -1,12 +1,42 @@
+import { randomUUID } from "crypto";
 import { qdrant } from "../../infrastructure/qdrant/client";
+import { EmbeddingService } from "../../embeddings/embedding";
+import type { MemoryRecord } from "../types";
 
 export class VectorMemory {
-  async remember(text: string) {
-    console.log(`Saving memory: ${text}`);
+  private embedding = new EmbeddingService();
 
-    // Na razie tylko sprawdzamy połączenie.
-    await qdrant.getCollections();
+  async remember(memory: MemoryRecord) {
+    console.log(`Saving memory: ${memory.text}`);
 
-    console.log("Memory connection OK");
+    const vector = await this.embedding.embed(memory.text);
+
+    await qdrant.upsert("hades_memory", {
+      wait: true,
+      points: [
+        {
+          id: randomUUID(),
+          vector,
+          payload: memory,
+        },
+      ],
+    });
+
+    console.log("Memory saved.");
+  }
+
+  async search(query: string, limit = 5) {
+    const vector = await this.embedding.embed(query);
+
+    const results = await qdrant.search("hades_memory", {
+      vector,
+      limit,
+      with_payload: true,
+    });
+
+    return results.map((item: any) => ({
+      score: item.score,
+      memory: item.payload,
+    }));
   }
 }

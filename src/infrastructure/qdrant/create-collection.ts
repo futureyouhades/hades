@@ -14,7 +14,7 @@ async function createCollection() {
 
   await qdrant.createCollection("hades_memory", {
     vectors: {
-      size: 1536,
+      size: 384,
       distance: "Cosine",
     },
   });
