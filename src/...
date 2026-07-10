@@ -14,19 +14,9 @@ export class HadesCommander {
       return await askHades("Przedstaw się jako Hades.");
     }
 
-    const plan = this.planner.plan(input);
-
-    if (plan.useSearch) {
-      console.log("[Planner] Search required");
-    }
-
-    if (plan.useTools) {
-      console.log("[Planner] Tools required");
-    }
-
-    if (plan.useAgent) {
-      console.log(`[Planner] Agent: ${plan.selectedAgent}`);
-    }
+    // Planner analizuje zadanie.
+    // W tym sprincie wynik planu nie zmienia jeszcze zachowania Braina.
+    this.planner.plan(input);
 
     return await askHades(input);
   }
