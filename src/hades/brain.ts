@@ -1,4 +1,5 @@
 import { askClaude } from "../ai/claude.js";
+import { HADES_IDENTITY } from "./identity.js";
 import { VectorMemory } from "../memory/vector/vector-memory.js";
 import { MemoryManager } from "../memory/memory-manager.js";
 
@@ -26,7 +27,7 @@ export async function askHades(question: string) {
     .join("\n");
 
   const prompt = `
-Jesteś Hades.
+${HADES_IDENTITY}
 
 Zapamiętane informacje:
 
