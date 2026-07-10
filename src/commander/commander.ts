@@ -1,4 +1,4 @@
-import { askHades } from "../hades/brain";
+import { askHades } from "../hades/brain.js";
 
 export class HadesCommander {
   async execute(input: string): Promise<string> {

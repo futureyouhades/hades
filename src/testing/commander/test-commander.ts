@@ -1,4 +1,4 @@
-import { HadesCommander } from "../../commander/commander";
+import { HadesCommander } from "../../commander/commander.js";
 
 async function main() {
 

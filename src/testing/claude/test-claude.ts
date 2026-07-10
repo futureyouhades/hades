@@ -1,4 +1,4 @@
-import { askClaude } from "../../ai/claude";
+import { askClaude } from "../../ai/claude.js";
 
 async function main() {
   console.log("=== TEST CLAUDE ===");

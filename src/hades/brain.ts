@@ -1,21 +1,21 @@
-import { askClaude } from "../ai/claude";
-import { VectorMemory } from "../memory/vector/vector-memory";
-import { MemoryManager } from "../memory/manager/memory-manager";
+import { askClaude } from "../ai/claude.js";
+import { VectorMemory } from "../memory/vector/vector-memory.js";
+import { MemoryManager } from "../memory/memory-manager.js";
 
 const memory = new VectorMemory();
 const manager = new MemoryManager();
 
 export async function askHades(question: string) {
-
-  const decision = await manager.evaluate(question);
+  const decision = manager.evaluate(question);
 
   if (decision.save) {
     await memory.remember({
       text: question,
-      type: "conversation",
+      type: "knowledge",
       importance: decision.importance,
       source: "user",
       tags: ["conversation"],
+      createdAt: new Date().toISOString(),
     });
   }
 
@@ -41,10 +41,11 @@ ${question}
 
   await memory.remember({
     text: answer,
-    type: "conversation",
+    type: "knowledge",
     importance: 7,
     source: "assistant",
     tags: ["conversation"],
+    createdAt: new Date().toISOString(),
   });
 
   return answer;

@@ -1,10 +1,10 @@
-import { qdrant } from "./client";
+import { qdrant } from "./client.js";
 
 async function createCollection() {
   const collections = await qdrant.getCollections();
 
   const exists = collections.collections.some(
-    (c) => c.name === "hades_memory"
+    (c: { name: string }) => c.name === "hades_memory"
   );
 
   if (exists) {

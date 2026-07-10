@@ -21,7 +21,7 @@ export async function askClaude(prompt: string): Promise<string> {
 
   const content = response.content[0];
 
-  if (content.type !== "text") {
+  if (!content || content.type !== "text") {
     return "";
   }
 

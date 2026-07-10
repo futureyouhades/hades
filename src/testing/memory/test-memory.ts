@@ -1,4 +1,4 @@
-import { MemoryManager } from "../../memory/memory-manager";
+import { MemoryManager } from "../../memory/memory-manager.js";
 
 async function main() {
   const memory = new MemoryManager();
@@ -32,7 +32,6 @@ async function main() {
     createdAt: new Date().toISOString(),
   });
 
-  // Ta informacja NIE powinna zostać zapisana
   await memory.remember({
     text: "Dzisiaj świeci słońce.",
     type: "knowledge",

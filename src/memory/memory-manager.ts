@@ -1,8 +1,27 @@
-import { VectorMemory } from "./vector/vector-memory";
-import type { MemoryRecord } from "./types";
+import { VectorMemory } from "./vector/vector-memory.js";
+import type { MemoryRecord } from "./types.js";
+
+export interface MemoryDecision {
+  save: boolean;
+  importance: number;
+}
 
 export class MemoryManager {
   private memory = new VectorMemory();
+
+  evaluate(text: string): MemoryDecision {
+    if (text.length < 10) {
+      return {
+        save: false,
+        importance: 1,
+      };
+    }
+
+    return {
+      save: true,
+      importance: 7,
+    };
+  }
 
   async remember(memory: MemoryRecord) {
     if (memory.importance < 5) {

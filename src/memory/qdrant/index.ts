@@ -1,1 +1,1 @@
-export * from "./qdrant";
+export * from "./qdrant.js";

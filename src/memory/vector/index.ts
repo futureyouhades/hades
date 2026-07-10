@@ -1,1 +1,1 @@
-export * from "./vector-memory";
+export * from "./vector-memory.js";

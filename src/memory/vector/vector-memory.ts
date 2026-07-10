@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import { qdrant } from "../../infrastructure/qdrant/client";
-import { EmbeddingService } from "../../embeddings/embedding";
-import type { MemoryRecord } from "../types";
+import { qdrant } from "../../infrastructure/qdrant/client.js";
+import { EmbeddingService } from "../../embeddings/embedding.js";
+import type { MemoryRecord } from "../types.js";
 
 export class VectorMemory {
   private embedding = new EmbeddingService();
@@ -17,7 +17,7 @@ export class VectorMemory {
         {
           id: randomUUID(),
           vector,
-          payload: memory,
+          payload: memory as unknown as Record<string, unknown>,
         },
       ],
     });
