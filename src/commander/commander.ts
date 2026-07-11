@@ -11,7 +11,8 @@ export class HadesCommander {
       command.includes("jak masz na imię") ||
       command.includes("kim jesteś")
     ) {
-      return await askHades("Przedstaw się jako Hades.");
+      const plan = this.planner.plan(input);
+      return await askHades("Przedstaw się jako Hades.", plan);
     }
 
     const plan = this.planner.plan(input);
@@ -28,6 +29,6 @@ export class HadesCommander {
       console.log(`[Planner] Agent: ${plan.selectedAgent}`);
     }
 
-    return await askHades(input);
+    return await askHades(input, plan);
   }
 }
