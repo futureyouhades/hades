@@ -1,6 +1,12 @@
 import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
 
+import type {
+  AgentTask,
+  AgentResult,
+  HadesAgent,
+} from "../agents/core/index.js";
+
 export interface EmailMessage {
   uid: number;
   from: string;
@@ -9,7 +15,11 @@ export interface EmailMessage {
   date: Date;
 }
 
-export class EmailAgent {
+export class EmailAgent implements HadesAgent {
+  readonly name = "email";
+
+  readonly description = "Email Agent";
+
   private client = new ImapFlow({
     host: process.env.IMAP_HOST!,
     port: Number(process.env.IMAP_PORT ?? 993),
@@ -19,6 +29,26 @@ export class EmailAgent {
       pass: process.env.EMAIL_PASSWORD!,
     },
   });
+
+  canHandle(task: AgentTask): boolean {
+    return task.type === "email";
+  }
+
+  async execute(task: AgentTask): Promise<AgentResult> {
+    await this.connect();
+
+    const emails = await this.getLatest(
+      Number(task.context?.limit ?? 10)
+    );
+
+    await this.disconnect();
+
+    return {
+      success: true,
+      agent: this.name,
+      output: emails,
+    };
+  }
 
   async connect(): Promise<void> {
     await this.client.connect();

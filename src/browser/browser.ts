@@ -1,10 +1,34 @@
+import type {
+  AgentTask,
+  AgentResult,
+  HadesAgent,
+} from "../agents/core/index.js";
+
 export interface BrowserResult {
   url: string;
   title: string;
   content: string;
 }
 
-export class HadesBrowser {
+export class HadesBrowser implements HadesAgent {
+  readonly name = "browser";
+
+  readonly description = "Browser Agent";
+
+  canHandle(task: AgentTask): boolean {
+    return task.type === "browser";
+  }
+
+  async execute(task: AgentTask): Promise<AgentResult> {
+    const result = await this.open(task.input);
+
+    return {
+      success: true,
+      agent: this.name,
+      output: result,
+    };
+  }
+
   public async open(url: string): Promise<BrowserResult> {
     console.log(`🌐 Opening: ${url}`);
 
