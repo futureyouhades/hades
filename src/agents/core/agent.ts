@@ -1,9 +1,10 @@
+import type { AgentTask, AgentResult } from "./types.js";
+
 export interface HadesAgent {
-  id: string;
-  name: string;
-  description: string;
+  readonly name: string;
+  readonly description: string;
 
-  canHandle(task: string): boolean;
+  canHandle(task: AgentTask): boolean;
 
-  execute(task: string): Promise<string>;
+  execute(task: AgentTask): Promise<AgentResult>;
 }

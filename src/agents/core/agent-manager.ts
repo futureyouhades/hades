@@ -1,4 +1,5 @@
 import type { HadesAgent } from "./agent.js";
+import type { AgentTask, AgentResult } from "./types.js";
 
 export class AgentManager {
   private readonly agents: HadesAgent[] = [];
@@ -7,18 +8,23 @@ export class AgentManager {
     this.agents.push(agent);
   }
 
-  findAgent(task: string): HadesAgent | undefined {
+  findAgent(task: AgentTask): HadesAgent | undefined {
     return this.agents.find((agent) => agent.canHandle(task));
   }
 
-  async execute(task: string): Promise<string> {
+  async execute(task: AgentTask): Promise<AgentResult> {
     const agent = this.findAgent(task);
 
     if (!agent) {
-      return "Nie znalazłem odpowiedniego agenta do wykonania tego zadania.";
+      return {
+        success: false,
+        agent: "AgentManager",
+        output: null,
+        error: "Nie znalazłem odpowiedniego agenta do wykonania tego zadania.",
+      };
     }
 
-    return agent.execute(task);
+    return await agent.execute(task);
   }
 
   getAgents(): HadesAgent[] {
