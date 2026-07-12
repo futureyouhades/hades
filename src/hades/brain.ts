@@ -1,4 +1,4 @@
-import { askClaude } from "../ai/claude.js";
+import { askModel } from "../ai/model-router.js";
 import { HADES_IDENTITY } from "./identity.js";
 import { VectorMemory } from "../memory/vector/vector-memory.js";
 import { MemoryManager } from "../memory/memory-manager.js";
@@ -6,7 +6,7 @@ import { MemoryManager } from "../memory/memory-manager.js";
 const memory = new VectorMemory();
 const manager = new MemoryManager();
 
-export async function askHades(question: string) {
+export async function askHades(question: string): Promise<string> {
   const decision = manager.evaluate(question);
 
   if (decision.save) {
@@ -38,7 +38,7 @@ Pytanie użytkownika:
 ${question}
 `;
 
-  const answer = await askClaude(prompt);
+  const answer = await askModel(prompt);
 
   await memory.remember({
     text: answer,
