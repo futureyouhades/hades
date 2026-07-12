@@ -1,8 +1,11 @@
 export interface PlannerResult {
   useMemory: boolean;
-  useAgent: boolean;
-  useTools: boolean;
+
   useSearch: boolean;
+  useBrowser: boolean;
+  useSocial: boolean;
+  useEmail: boolean;
+  useTools: boolean;
 
   selectedAgent?: string;
   selectedModel?: string;

@@ -11,23 +11,29 @@ export class HadesCommander {
       command.includes("jak masz na imię") ||
       command.includes("kim jesteś")
     ) {
-      this.planner.plan(input);
-
       return await askHades("Przedstaw się jako Hades.");
     }
 
     const plan = this.planner.plan(input);
 
     if (plan.useSearch) {
-      console.log("[Planner] Search required");
+      console.log("[Planner] Search");
+    }
+
+    if (plan.useBrowser) {
+      console.log("[Planner] Browser");
+    }
+
+    if (plan.useSocial) {
+      console.log("[Planner] Social");
+    }
+
+    if (plan.useEmail) {
+      console.log("[Planner] Email");
     }
 
     if (plan.useTools) {
-      console.log("[Planner] Tools required");
-    }
-
-    if (plan.useAgent) {
-      console.log(`[Planner] Agent: ${plan.selectedAgent}`);
+      console.log("[Planner] Tools");
     }
 
     return await askHades(input);

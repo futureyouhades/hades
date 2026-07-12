@@ -1,50 +1,42 @@
-export interface PlannerResult {
-  useMemory: boolean;
-  useAgent: boolean;
-  useTools: boolean;
-  useSearch: boolean;
-  selectedAgent?: string;
-  selectedModel?: string;
-}
+import type { PlannerResult } from "./types.js";
 
 export class HadesPlanner {
   plan(task: string): PlannerResult {
-
     const text = task.toLowerCase();
 
-    const result: PlannerResult = {
+    return {
       useMemory: true,
-      useAgent: false,
-      useTools: false,
-      useSearch: false,
-      selectedModel: "claude"
+
+      useSearch:
+        text.includes("wyszukaj") ||
+        text.includes("znajdź") ||
+        text.includes("internet") ||
+        text.includes("google"),
+
+      useBrowser:
+        text.includes("otwórz") ||
+        text.includes("stronę") ||
+        text.includes("website") ||
+        text.includes("url"),
+
+      useSocial:
+        text.includes("post") ||
+        text.includes("facebook") ||
+        text.includes("instagram") ||
+        text.includes("linkedin") ||
+        text.includes("social"),
+
+      useEmail:
+        text.includes("mail") ||
+        text.includes("email") ||
+        text.includes("gmail") ||
+        text.includes("wiadomość"),
+
+      useTools:
+        text.includes("uruchom") ||
+        text.includes("otwórz aplikację"),
+
+      selectedModel: "claude",
     };
-
-    if (
-      text.includes("napisz") ||
-      text.includes("kod") ||
-      text.includes("typescript") ||
-      text.includes("python")
-    ) {
-      result.useAgent = true;
-      result.selectedAgent = "programmer";
-    }
-
-    if (
-      text.includes("wyszukaj") ||
-      text.includes("internet") ||
-      text.includes("google")
-    ) {
-      result.useSearch = true;
-    }
-
-    if (
-      text.includes("otwórz") ||
-      text.includes("uruchom")
-    ) {
-      result.useTools = true;
-    }
-
-    return result;
   }
 }
