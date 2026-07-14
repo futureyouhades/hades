@@ -23,13 +23,25 @@ export class SocialAgent implements HadesAgent {
   }
 
   async execute(task: AgentTask): Promise<AgentResult> {
-    const post = await this.generate(task.input);
+    try {
+      const post = await this.generate(task.input);
 
-    return {
-      success: true,
-      agent: this.name,
-      output: post,
-    };
+      return {
+        success: true,
+        agent: this.name,
+        output: post,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        agent: this.name,
+        output: null,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Nie udało się wygenerować posta.",
+      };
+    }
   }
 
   async generate(topic: string): Promise<SocialPost> {
@@ -49,10 +61,38 @@ Przygotuj odpowiedź WYŁĄCZNIE w JSON:
   "cta":"",
   "imagePrompt":""
 }
+
+Zwróć wyłącznie surowy JSON w powyższym formacie.
+Bez komentarzy, bez bloków kodu (\`\`\`), bez tekstu przed ani po.
+Pole "post" nie może być puste.
 `;
 
     const answer = await askModel(prompt);
 
-    return JSON.parse(answer) as SocialPost;
+    return this.parsePost(answer);
+  }
+
+  private parsePost(answer: string): SocialPost {
+    // Modele często opakowują JSON w blok ```json ... ``` lub dodają tekst.
+    const withoutFence = answer
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const start = withoutFence.indexOf("{");
+    const end = withoutFence.lastIndexOf("}");
+
+    const candidate =
+      start !== -1 && end !== -1 && end > start
+        ? withoutFence.slice(start, end + 1)
+        : withoutFence;
+
+    try {
+      return JSON.parse(candidate) as SocialPost;
+    } catch {
+      throw new Error(
+        "Model nie zwrócił poprawnego JSON dla posta social media."
+      );
+    }
   }
 }

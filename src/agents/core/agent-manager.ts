@@ -24,7 +24,19 @@ export class AgentManager {
       };
     }
 
-    return await agent.execute(task);
+    try {
+      return await agent.execute(task);
+    } catch (error) {
+      return {
+        success: false,
+        agent: agent.name,
+        output: null,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Nieznany błąd podczas wykonywania agenta.",
+      };
+    }
   }
 
   getAgents(): HadesAgent[] {

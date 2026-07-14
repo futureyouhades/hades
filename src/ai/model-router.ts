@@ -17,6 +17,10 @@ export async function askModel(prompt: string): Promise<string> {
 
     return await askClaude(prompt);
   } catch {
-    return await askClaude(prompt);
+    try {
+      return await askClaude(prompt);
+    } catch {
+      return "Przepraszam, wystąpił problem z modelem AI. Spróbuj ponownie za chwilę.";
+    }
   }
 }

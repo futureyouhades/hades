@@ -35,19 +35,22 @@ export class EmailAgent implements HadesAgent {
   }
 
   async execute(task: AgentTask): Promise<AgentResult> {
-    await this.connect();
+    try {
+      await this.connect();
 
-    const emails = await this.getLatest(
-      Number(task.context?.limit ?? 10)
-    );
+      const emails = await this.getLatest(
+        Number(task.context?.limit ?? 10)
+      );
 
-    await this.disconnect();
-
-    return {
-      success: true,
-      agent: this.name,
-      output: emails,
-    };
+      return {
+        success: true,
+        agent: this.name,
+        output: emails,
+      };
+    } finally {
+      // disconnect nie może zamaskować oryginalnego błędu połączenia/pobierania
+      await this.disconnect().catch(() => {});
+    }
   }
 
   async connect(): Promise<void> {

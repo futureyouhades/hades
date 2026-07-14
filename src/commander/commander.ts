@@ -2,6 +2,7 @@ import { askHades } from "../hades/brain.js";
 import { askModel } from "../ai/model-router.js";
 import { HadesPlanner } from "../planner/index.js";
 import { HadesOrchestrator } from "../orchestrator/index.js";
+import type { BrowserResult } from "../browser/index.js";
 
 interface SearchResult {
   title: string;
@@ -82,6 +83,51 @@ ${s.content}
       }
     }
 
+    if (plan.useBrowser) {
+      const url = this.extractUrl(input);
+
+      if (url) {
+        const result = await this.orchestrator.execute({
+          id: crypto.randomUUID(),
+          type: "browser",
+          input: url,
+        });
+
+        if (result.success) {
+          const page = result.output as BrowserResult;
+
+          const prompt = `
+Jesteś Hades.
+
+Użytkownik poprosił o otwarcie i analizę strony internetowej.
+
+Zapytanie użytkownika:
+
+${input}
+
+Zawartość pobranej strony:
+
+URL:
+${page.url}
+
+TYTUŁ:
+${page.title}
+
+TREŚĆ:
+${page.content}
+
+Twoje zadanie:
+
+- przeanalizuj treść strony,
+- odpowiedz na potrzebę użytkownika własnymi słowami,
+- jeżeli strona nie zawiera potrzebnych informacji, powiedz to wprost.
+`;
+
+          return await askModel(prompt);
+        }
+      }
+    }
+
     if (plan.useSocial) {
       const result = await this.orchestrator.execute({
         id: crypto.randomUUID(),
@@ -107,5 +153,15 @@ ${s.content}
     }
 
     return await askHades(input);
+  }
+
+  private extractUrl(input: string): string | null {
+    const match = input.match(/https?:\/\/[^\s<>"']+/i);
+
+    if (!match) {
+      return null;
+    }
+
+    return match[0].replace(/[.,!?;:)\]}]+$/, "");
   }
 }
