@@ -5,7 +5,7 @@ const telemetry = [["NEURAL NETWORK", "12,984 NODES", "top-left"], ["DATA FLOW",
 export default function CenterPanel() {
   return (
     <section className="center-panel" aria-label="Hades AI core">
-      <div className="center-header"><div><span className="core-kicker">CENTRAL INTELLIGENCE / NODE 01</span><div className="center-title">HADES AI CORE</div></div><div className="center-status">● SYNCHRONIZED</div></div>
+      <div className="center-header"><div><span className="core-kicker">CENTRAL INTELLIGENCE / NODE 01</span><div className="center-title">HADES</div></div><div className="center-status">● SYNCHRONIZED</div></div>
       <div className="brain-wrapper">
         <BrainCore />
         <div className="core-crosshair" aria-hidden="true" />

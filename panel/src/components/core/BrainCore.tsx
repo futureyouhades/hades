@@ -1,128 +1,24 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Float,
-  OrbitControls,
-  Environment
-} from "@react-three/drei";
-import {
-  Bloom,
-  EffectComposer
-} from "@react-three/postprocessing";
+import { Float, OrbitControls } from "@react-three/drei";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { useRef } from "react";
 import * as THREE from "three";
-
-import BrainParticles from "./BrainParticles";
 import BrainGlow from "./BrainGlow";
 import BrainNetwork from "./BrainNetwork";
+import BrainParticles from "./BrainParticles";
 import BrainRings from "./BrainRings";
+import StatusHalo from "./StatusHalo";
+
 function CoreSphere() {
-  const mesh = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (!mesh.current) return;
-
-    mesh.current.rotation.y += 0.002;
-    mesh.current.rotation.x += 0.001;
-
-    const pulse =
-      1 + Math.sin(state.clock.elapsedTime * 2.5) * 0.05;
-
-    mesh.current.scale.set(
-      pulse,
-      pulse,
-      pulse
-    );
-  });
-
-  return (
-    <Float
-      speed={2}
-      floatIntensity={1.5}
-      rotationIntensity={2}
-    >
-      <mesh ref={mesh}>
-        <icosahedronGeometry args={[1, 8]} />
-
-        <meshPhysicalMaterial
-          color="#5be9ff"
-          emissive="#11d7ff"
-          emissiveIntensity={4}
-          transmission={0.2}
-          thickness={1}
-          roughness={0.15}
-          metalness={0.35}
-          clearcoat={1}
-        />
-      </mesh>
-    </Float>
-  );
+  const group = useRef<THREE.Group>(null);
+  useFrame((state, delta) => { if (!group.current) return; const pulse = 1 + Math.sin(state.clock.elapsedTime * 2.2) * .045; group.current.rotation.y += delta * .28; group.current.rotation.x += delta * .09; group.current.scale.setScalar(pulse); });
+  return <Float speed={1.6} floatIntensity={.55} rotationIntensity={.2}><group ref={group}><mesh><icosahedronGeometry args={[1, 7]} /><meshPhysicalMaterial color="#65eeff" emissive="#10cbff" emissiveIntensity={5} transmission={.32} thickness={.7} roughness={.08} metalness={.5} clearcoat={1} /></mesh><mesh scale={1.045}><icosahedronGeometry args={[1, 5]} /><meshBasicMaterial color="#b4fbff" wireframe transparent opacity={.32} /></mesh></group></Float>;
 }
-
 
 function Scene() {
-  return (
-    <>
-      <color attach="background" args={["#02040a"]} />
-
-      <ambientLight intensity={0.4} />
-
-      <pointLight
-        position={[0, 0, 0]}
-        intensity={25}
-        color="#44dfff"
-      />
-
-      <pointLight
-        position={[4, 3, 2]}
-        intensity={8}
-        color="#3f8cff"
-      />
-
-      <pointLight
-        position={[-4, -3, -2]}
-        intensity={4}
-        color="#ffffff"
-      />
-
-      <Environment preset="night" />
-
-      <CoreSphere />
-      <BrainGlow />
-      <BrainNetwork />
-      <BrainRings />
-
-      <BrainParticles />
-
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        autoRotate
-        autoRotateSpeed={0.35}
-      />
-    </>
-  );
+  return <><ambientLight intensity={.25} /><pointLight position={[0, 0, 1]} intensity={35} color="#3fe8ff" /><pointLight position={[3, 2, 2]} intensity={11} color="#4f8cff" /><pointLight position={[-3, -2, 1]} intensity={7} color="#7eefff" /><CoreSphere /><BrainGlow /><BrainNetwork connections={260} /><BrainRings /><StatusHalo /><BrainParticles count={4200} /><OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={.22} /></>;
 }
+
 export default function BrainCore() {
-  return (
-    <Canvas
-      camera={{
-        position: [0, 0, 6],
-        fov: 45
-      }}
-      dpr={[1, 2]}
-    >
-      <Scene />
-
-      <EffectComposer>
-        <Bloom
-          intensity={2}
-          mipmapBlur
-          luminanceThreshold={0.15}
-          luminanceSmoothing={0.9}
-        />
-      </EffectComposer>
-    </Canvas>
-  );
+  return <Canvas gl={{ alpha: true, antialias: true }} camera={{ position: [0, 0, 6], fov: 42 }} dpr={[1, 2]}><Scene /><EffectComposer><Bloom intensity={2.7} mipmapBlur luminanceThreshold={.08} luminanceSmoothing={.9} /></EffectComposer></Canvas>;
 }
-import StatusHalo from "./StatusHalo";
-      <StatusHalo />
