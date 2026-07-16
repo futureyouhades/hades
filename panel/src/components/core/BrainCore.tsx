@@ -124,3 +124,5 @@ export default function BrainCore() {
     </Canvas>
   );
 }
+import StatusHalo from "./StatusHalo";
+      <StatusHalo />
