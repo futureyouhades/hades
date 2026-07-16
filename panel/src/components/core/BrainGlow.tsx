@@ -1,28 +1,34 @@
 import { useFrame } from "@react-three/fiber";
 import { AdditiveBlending } from "three";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
+
+type LayerProps = {
+  radius: number;
+  opacity: number;
+  color: string;
+  speed: number;
+};
 
 function GlowLayer({
   radius,
   opacity,
   color,
   speed,
-}: {
-  radius: number;
-  opacity: number;
-  color: string;
-  speed: number;
-}) {
+}: LayerProps) {
   const ref = useRef<THREE.Mesh>(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!ref.current) return;
+
+    const t = state.clock.elapsedTime;
+
+    ref.current.rotation.y += speed * delta * 0.25;
+    ref.current.rotation.x += speed * delta * 0.12;
 
     const pulse =
       1 +
-      Math.sin(state.clock.elapsedTime * speed) *
-        0.04;
+      Math.sin(t * speed * 2.0) * 0.03;
 
     ref.current.scale.set(
       pulse,
@@ -47,35 +53,47 @@ function GlowLayer({
 }
 
 export default function BrainGlow() {
+  const layers = useMemo(
+    () => [
+      {
+        radius: 1.22,
+        opacity: 0.12,
+        color: "#00d9ff",
+        speed: 1.8,
+      },
+      {
+        radius: 1.45,
+        opacity: 0.08,
+        color: "#36e5ff",
+        speed: 1.4,
+      },
+      {
+        radius: 1.72,
+        opacity: 0.05,
+        color: "#78f7ff",
+        speed: 1.1,
+      },
+      {
+        radius: 2.05,
+        opacity: 0.025,
+        color: "#d8ffff",
+        speed: 0.8,
+      },
+    ],
+    []
+  );
+
   return (
     <>
-      <GlowLayer
-        radius={1.25}
-        opacity={0.10}
-        color="#00d9ff"
-        speed={2}
-      />
-
-      <GlowLayer
-        radius={1.55}
-        opacity={0.06}
-        color="#42e8ff"
-        speed={1.5}
-      />
-
-      <GlowLayer
-        radius={1.90}
-        opacity={0.035}
-        color="#78f5ff"
-        speed={1.2}
-      />
-
-      <GlowLayer
-        radius={2.25}
-        opacity={0.02}
-        color="#c8ffff"
-        speed={0.8}
-      />
+      {layers.map((layer, index) => (
+        <GlowLayer
+          key={index}
+          radius={layer.radius}
+          opacity={layer.opacity}
+          color={layer.color}
+          speed={layer.speed}
+        />
+      ))}
     </>
   );
 }
