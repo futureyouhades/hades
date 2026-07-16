@@ -1,22 +1,18 @@
 import "./App.css";
 
-import TopBar from "./components/layout/TopBar";
-import LeftPanel from "./components/layout/LeftPanel";
+import BottomStatusBar from "./components/layout/BottomStatusBar";
 import CenterPanel from "./components/layout/CenterPanel";
+import LeftPanel from "./components/layout/LeftPanel";
 import RightPanel from "./components/layout/RightPanel";
+import TopBar from "./components/layout/TopBar";
 
 export default function App() {
   return (
-    <div className="app">
+    <div className="control-center">
+      <div className="hud-noise" aria-hidden="true" />
       <TopBar />
-
-      <main className="dashboard">
-        <LeftPanel />
-
-        <CenterPanel />
-
-        <RightPanel />
-      </main>
+      <main className="dashboard" aria-label="Hades Control Center"><LeftPanel /><CenterPanel /><RightPanel /></main>
+      <BottomStatusBar />
     </div>
   );
 }
