@@ -9,8 +9,8 @@ function Ring(props: RingData) {
 }
 export default function BrainRings(){
   const rings=useMemo<RingData[]>(()=>[
-    {radius:1.78,tube:.0025,speed:.025,rotation:[.28,.08,0],color:"#3cdbff",opacity:.095},
-    {radius:2.12,tube:.002,speed:-.016,rotation:[1.04,.32,.5],color:"#5472ff",opacity:.06}
+    {radius:1.78,tube:.0016,speed:.032,rotation:[.28,.08,0],color:"#3cdbff",opacity:.055},
+    {radius:2.12,tube:.0014,speed:-.024,rotation:[1.04,.32,.5],color:"#5472ff",opacity:.035}
   ],[]);
   return <>{rings.map((ring,i)=><Ring key={i} {...ring}/>)}</>;
 }

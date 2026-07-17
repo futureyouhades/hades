@@ -16,8 +16,8 @@ const NeuralPointMaterial = shaderMaterial(
    void main() {
      vec4 mv = modelViewMatrix * vec4(position, 1.0);
      float depth = smoothstep(-1.25, 1.35, position.z);
-     float flicker = .72 + .28 * sin(uTime * (1.2 + fract(aSeed * 17.0) * 2.4) + aSeed * 31.0);
-     float eventPulse = pow(max(0.0, sin(uTime * .72 + aSeed * 47.0)), 18.0);
+     float flicker = .68 + .32 * sin(uTime * (3.0 + fract(aSeed * 17.0) * 4.8) + aSeed * 31.0);
+     float eventPulse = pow(max(0.0, sin(uTime * 2.15 + aSeed * 47.0)), 18.0);
      float power = aStrength * flicker + eventPulse * .8;
      vec3 deep = vec3(.08, .28, .95);
      vec3 cyan = vec3(.08, .88, 1.0);
@@ -58,18 +58,23 @@ function seeded(seed: number) {
 function brainPoint(side: -1 | 1, u: number, v: number, layer: number) {
   const theta = u * Math.PI * 2;
   const phi = v * Math.PI;
-  const sx = Math.sin(phi) * Math.cos(theta);
   const sy = Math.cos(phi);
-  const sz = Math.sin(phi) * Math.sin(theta);
+  const corticalWidth = Math.pow(Math.sin(phi), .62);
+  const sx = corticalWidth * Math.cos(theta);
+  const sz = corticalWidth * Math.sin(theta);
   const folds =
-    Math.sin(theta * 7.0 + phi * 2.5) * .045 +
-    Math.sin(phi * 11.0 - theta * 2.0) * .032 +
-    Math.sin((theta + phi) * 15.0) * .014;
+    Math.sin(theta * 5.0 + phi * 3.5) * .065 +
+    Math.sin(phi * 9.0 - theta * 2.7) * .045 +
+    Math.sin((theta + phi) * 14.0) * .022;
   const crown = 1 + folds * layer;
   const lowerTaper = THREE.MathUtils.smoothstep(sy, -1, -.25);
-  const x = side * .43 + sx * .66 * crown * layer;
-  const y = .08 + sy * .93 * crown * layer + Math.max(0, sx) * .04 - lowerTaper * .12;
-  const z = sz * .75 * crown * layer;
+  const medial = .82 + .18 * Math.abs(sx);
+  const lowerWidth = .74 + .26 * THREE.MathUtils.smoothstep(sy, -.82, .16);
+  const x = side * .61 + sx * .54 * crown * layer * medial * lowerWidth;
+  const asymmetry = side * .018 * Math.sin(theta * 2.0);
+  const y = .1 + sy * .88 * crown * layer + Math.max(0, sy) * .1 - lowerTaper * .2 + asymmetry;
+  const temporal = Math.max(0, -sy) * (.08 + .04 * side);
+  const z = sz * (.58 + temporal) * crown * layer + side * .025 * (1.0 - sy);
   return new THREE.Vector3(x, y, z);
 }
 
@@ -120,11 +125,11 @@ export default function BrainNetwork({ connections = 1800 }: Props) {
       }
     }
 
-    for (let i = 0; i < 70; i++) {
-      const y = -.7 + random() * 1.5;
+    for (let i = 0; i < 28; i++) {
+      const y = -.48 + random() * 1.12;
       const z = -.42 + random() * .84;
-      const a = new THREE.Vector3(-.12 - random() * .24, y, z);
-      const b = new THREE.Vector3(.12 + random() * .24, y + (random() - .5) * .08, z + (random() - .5) * .08);
+      const a = new THREE.Vector3(-.09 - random() * .15, y, z);
+      const b = new THREE.Vector3(.09 + random() * .15, y + (random() - .5) * .08, z + (random() - .5) * .08);
       lines.push(a.x, a.y, a.z, b.x, b.y, b.z);
       lineColors.push(.1,.45,.8,.2,.8,1);
       paths.push([a,b]);
@@ -144,7 +149,7 @@ export default function BrainNetwork({ connections = 1800 }: Props) {
       const t = state.clock.elapsedTime;
       for (let i = 0; i < attr.count; i++) {
         const path = surface.paths[(i * 53) % surface.paths.length];
-        const phase = (t * (.09 + (i % 9) * .009) + i * .173) % 1;
+        const phase = (t * (.3 + (i % 9) * .028) + i * .173) % 1;
         const ease = phase * phase * (3 - 2 * phase);
         attr.setXYZ(i,
           THREE.MathUtils.lerp(path[0].x, path[1].x, ease),
@@ -156,8 +161,8 @@ export default function BrainNetwork({ connections = 1800 }: Props) {
   });
 
   return <group>
-    <lineSegments><bufferGeometry><bufferAttribute attach="attributes-position" args={[surface.lines, 3]} /><bufferAttribute attach="attributes-color" args={[surface.lineColors, 3]} /></bufferGeometry><lineBasicMaterial vertexColors transparent opacity={.17} depthWrite={false} blending={THREE.AdditiveBlending} /></lineSegments>
+    <lineSegments><bufferGeometry><bufferAttribute attach="attributes-position" args={[surface.lines, 3]} /><bufferAttribute attach="attributes-color" args={[surface.lineColors, 3]} /></bufferGeometry><lineBasicMaterial vertexColors transparent opacity={.24} depthWrite={false} blending={THREE.AdditiveBlending} /></lineSegments>
     <points><bufferGeometry><bufferAttribute attach="attributes-position" args={[surface.points, 3]} /><bufferAttribute attach="attributes-aSeed" args={[surface.seeds, 1]} /><bufferAttribute attach="attributes-aStrength" args={[surface.strengths, 1]} /></bufferGeometry><neuralPointMaterial ref={material} transparent depthWrite={false} blending={THREE.AdditiveBlending} /></points>
-    <points ref={signals}><bufferGeometry><bufferAttribute attach="attributes-position" args={[signalPositions, 3]} /></bufferGeometry><pointsMaterial color="#f2ffff" size={.038} transparent opacity={.92} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} /></points>
+    <points ref={signals}><bufferGeometry><bufferAttribute attach="attributes-position" args={[signalPositions, 3]} /></bufferGeometry><pointsMaterial color="#f2ffff" size={.03} transparent opacity={.92} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} /></points>
   </group>;
 }
