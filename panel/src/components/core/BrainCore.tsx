@@ -10,16 +10,30 @@ import BrainRings from "./BrainRings";
 import StatusHalo from "./StatusHalo";
 
 function BrainLobe({ side }: { side: -1 | 1 }) {
-  return <group position={[side * .5, .03, 0]} rotation={[.03, side * .1, side * .055]} scale={[.72, 1.02, .8]}><mesh><icosahedronGeometry args={[1, 7]} /><meshPhysicalMaterial color="#26cce9" emissive="#078eb7" emissiveIntensity={1.65} transmission={.48} thickness={.35} roughness={.3} metalness={.2} transparent opacity={.72} /></mesh><mesh scale={1.025}><icosahedronGeometry args={[1, 5]} /><meshBasicMaterial color="#a8f9ff" wireframe transparent opacity={.42} /></mesh><mesh scale={.88}><icosahedronGeometry args={[1, 3]} /><meshBasicMaterial color="#1edaf4" wireframe transparent opacity={.2} /></mesh></group>;
+  return <group position={[side * .49, .04, 0]} rotation={[.02, side * .08, side * .045]} scale={[.7, 1.01, .79]}>
+    <mesh><icosahedronGeometry args={[1, 7]} /><meshPhysicalMaterial color={side < 0 ? "#16bedb" : "#27cce7"} emissive={side < 0 ? "#075d95" : "#087e9d"} emissiveIntensity={1.05} transmission={.58} thickness={.28} roughness={.34} metalness={.12} transparent opacity={.38} depthWrite={false} /></mesh>
+    <mesh scale={1.025}><icosahedronGeometry args={[1, 6]} /><meshBasicMaterial color="#9bf7ff" wireframe transparent opacity={.23} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+    <mesh scale={.86}><icosahedronGeometry args={[1, 4]} /><meshBasicMaterial color={side < 0 ? "#426dff" : "#5f7dff"} wireframe transparent opacity={.13} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+  </group>;
 }
+
 function HolographicBrain() {
   const group = useRef<THREE.Group>(null);
-  useFrame((state, delta) => { if (!group.current) return; const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.8) * .025; group.current.rotation.y += delta * .11; group.current.rotation.x = Math.sin(state.clock.elapsedTime * .28) * .06; group.current.scale.setScalar(pulse); });
-  return <Float speed={1.1} floatIntensity={.2} rotationIntensity={.06}><group ref={group}><BrainLobe side={-1} /><BrainLobe side={1} /><mesh scale={[.09,.98,.2]}><sphereGeometry args={[1,20,20]} /><meshBasicMaterial color="#c6fbff" transparent opacity={.34} /></mesh></group></Float>;
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    const t = state.clock.elapsedTime;
+    const breath = 1 + Math.sin(t * 1.12) * .014 + Math.sin(t * .37) * .006;
+    group.current.rotation.y += delta * .045;
+    group.current.rotation.x = Math.sin(t * .23) * .025;
+    group.current.scale.setScalar(breath);
+  });
+  return <Float speed={.7} floatIntensity={.09} rotationIntensity={.025}><group ref={group}><BrainLobe side={-1} /><BrainLobe side={1} /><mesh scale={[.045,.94,.13]}><sphereGeometry args={[1,16,24]} /><meshBasicMaterial color="#dffeff" transparent opacity={.14} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh></group></Float>;
 }
+
 function Scene() {
-  return <><ambientLight intensity={.34} /><pointLight position={[0, 0, 2]} intensity={15} color="#2ee6ff" /><pointLight position={[2.5, 2.5, 2]} intensity={6} color="#5d86ff" /><pointLight position={[-2.5, -2, 1]} intensity={5} color="#8ff8ff" /><HolographicBrain /><BrainGlow /><BrainNetwork radius={1.92} connections={560} /><BrainRings /><StatusHalo /><BrainParticles count={2400} radius={1.46} /><OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={.1} /></>;
+  return <><ambientLight intensity={.18} /><pointLight position={[0, 1.2, 2.4]} intensity={8} color="#69eeff" /><pointLight position={[2.4, .4, 1]} intensity={4} color="#476dff" /><pointLight position={[-2.2, -.8, 1]} intensity={3} color="#8d71ff" /><HolographicBrain /><BrainGlow /><BrainNetwork radius={1.92} connections={1250} /><BrainRings /><StatusHalo /><BrainParticles count={7200} radius={1.92} /><OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={.045} /></>;
 }
+
 export default function BrainCore() {
-  return <Canvas gl={{ alpha: true, antialias: true }} camera={{ position: [0, 0, 5.65], fov: 40 }} dpr={[1, 2]}><Scene /><EffectComposer><Bloom intensity={.8} mipmapBlur luminanceThreshold={.32} luminanceSmoothing={.55} /></EffectComposer></Canvas>;
+  return <Canvas gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }} camera={{ position: [0, 0, 5.55], fov: 39 }} dpr={[1, 2]}><Scene /><EffectComposer><Bloom intensity={.56} mipmapBlur luminanceThreshold={.48} luminanceSmoothing={.36} /></EffectComposer></Canvas>;
 }

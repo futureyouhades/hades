@@ -1,99 +1,25 @@
 import { useFrame } from "@react-three/fiber";
-import { AdditiveBlending } from "three";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
-type LayerProps = {
-  radius: number;
-  opacity: number;
-  color: string;
-  speed: number;
-};
+type LayerProps = { scale: [number, number, number]; opacity: number; color: string; speed: number; side: -1 | 1; };
 
-function GlowLayer({
-  radius,
-  opacity,
-  color,
-  speed,
-}: LayerProps) {
+function GlowLayer({ scale, opacity, color, speed, side }: LayerProps) {
   const ref = useRef<THREE.Mesh>(null);
-
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!ref.current) return;
-
-    const t = state.clock.elapsedTime;
-
-    ref.current.rotation.y += speed * delta * 0.25;
-    ref.current.rotation.x += speed * delta * 0.12;
-
-    const pulse =
-      1 +
-      Math.sin(t * speed * 2.0) * 0.03;
-
-    ref.current.scale.set(
-      pulse,
-      pulse,
-      pulse
-    );
+    const wave = 1 + Math.sin(state.clock.elapsedTime * speed + side) * .018;
+    ref.current.scale.set(scale[0] * wave, scale[1] * wave, scale[2] * wave);
+    const material = ref.current.material as THREE.MeshBasicMaterial;
+    material.opacity = opacity + Math.sin(state.clock.elapsedTime * speed * .7 + side) * opacity * .18;
   });
-
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[radius, 64, 64]} />
-
-      <meshBasicMaterial
-        color={color}
-        transparent
-        opacity={opacity}
-        blending={AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-  );
+  return <mesh ref={ref} position={[side * .49, .04, 0]} scale={scale}><icosahedronGeometry args={[1, 4]} /><meshBasicMaterial color={color} wireframe transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>;
 }
 
 export default function BrainGlow() {
-  const layers = useMemo(
-    () => [
-      {
-        radius: 1.22,
-        opacity: 0.12,
-        color: "#00d9ff",
-        speed: 1.8,
-      },
-      {
-        radius: 1.45,
-        opacity: 0.08,
-        color: "#36e5ff",
-        speed: 1.4,
-      },
-      {
-        radius: 1.72,
-        opacity: 0.05,
-        color: "#78f7ff",
-        speed: 1.1,
-      },
-      {
-        radius: 2.05,
-        opacity: 0.025,
-        color: "#d8ffff",
-        speed: 0.8,
-      },
-    ],
-    []
-  );
-
-  return (
-    <>
-      {layers.map((layer, index) => (
-        <GlowLayer
-          key={index}
-          radius={layer.radius}
-          opacity={layer.opacity}
-          color={layer.color}
-          speed={layer.speed}
-        />
-      ))}
-    </>
-  );
+  const layers = useMemo(() => [
+    { scale: [.76, 1.03, .83] as [number, number, number], opacity: .07, color: "#17dfff", speed: 1.15 },
+    { scale: [.69, .94, .75] as [number, number, number], opacity: .055, color: "#557dff", speed: .86 },
+  ], []);
+  return <>{layers.flatMap((layer, index) => ([-1, 1] as const).map(side => <GlowLayer key={index + ":" + side} {...layer} side={side} />))}</>;
 }
