@@ -1,7 +1,62 @@
+import Icon from "../ui/Icon";
 import HudCircleWidget from "./HudCircleWidget";
 
-const messages = [["HADES", "All systems are synchronized. How can I assist?"], ["OPERATOR", "Show current intelligence state."]];
+const feed = [
+  ["memory", "Memory Update", "2s ago", ""],
+  ["globe", "Web Search", "5s ago", ""],
+  ["brain", "AI Thinking", "3s ago", "purple"],
+  ["processing", "Data Processing", "1s ago", ""],
+  ["shield", "System Check", "OK", "green"],
+] as const;
+
+const actions = [
+  ["mic", "Voice", ""],
+  ["globe", "Browser", ""],
+  ["email", "Email", ""],
+  ["memory", "Memory", "purple"],
+  ["tasks", "Tasks", ""],
+  ["settings", "Settings", ""],
+] as const;
 
 export default function RightPanel() {
-  return <aside className="right-panel"><section className="hud-panel conversation-panel"><div className="panel-title">CONVERSATION</div><div className="conversation-feed">{messages.map(([role, message]) => <article className={role === "HADES" ? "message hades" : "message operator"} key={role}><span>{role}</span><p>{message}</p></article>)}</div><div className="conversation-input"><span>TYPE COMMAND...</span><button type="button" aria-label="Send command">↑</button></div></section><section className="hud-panel widget-row"><HudCircleWidget label="VOICE" value="ON" detail="VOICE INTERFACE READY" progress={94} /><HudCircleWidget label="MEMORY" value="98%" detail="LONG-TERM MEMORY" progress={98} /></section><section className="hud-panel activity-panel"><div className="panel-title">LIVE ACTIVITY</div><p><i /> MEMORY SYNCHRONIZATION COMPLETE</p><p><i /> MODEL ROUTER STANDING BY</p></section></aside>;
+  return (
+    <aside className="side-panel right-panel">
+      <section className="hud-panel">
+        <div className="panel-title">ACTIVITY FEED<span className="panel-dots">•••</span></div>
+        <div className="panel-body feed-list">
+          {feed.map(([icon, label, time, tone]) => (
+            <div className="feed-row" key={label}>
+              <span className={`feed-icon ${tone}`}><Icon name={icon} /></span>
+              <span className="feed-label">{label}</span>
+              <span className={`feed-time ${time === "OK" ? "green" : ""}`}>{time}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="hud-panel">
+        <div className="panel-title">QUICK ACTIONS<span className="panel-dots">•••</span></div>
+        <div className="panel-body action-grid">
+          {actions.map(([icon, label, tone]) => (
+            <button type="button" className="action-tile" key={label}>
+              <span className={`action-icon ${tone}`}><Icon name={icon} /></span>
+              <span className="action-label">{label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="hud-panel">
+        <div className="panel-title">MEMORY USAGE<span className="panel-dots">•••</span></div>
+        <div className="panel-body memory-body">
+          <HudCircleWidget label="" value="72%" detail="" progress={72} />
+          <div className="memory-info">
+            <div className="mem-row"><span>Used</span><strong>7.2 GB</strong></div>
+            <div className="mem-row"><span>Total</span><strong>10 GB</strong></div>
+            <div className="mem-row"><span>Vector DB</span><strong className="tag-purple">Qdrant</strong></div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  );
 }

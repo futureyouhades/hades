@@ -1,17 +1,49 @@
 import BrainCore from "../core/BrainCore";
+import Icon from "../ui/Icon";
 
-const telemetry = [["NEURAL NETWORK", "12,984 NODES", "top-left"], ["DATA FLOW", "98.4 TB/S", "top-right"], ["LEARNING MODE", "ADAPTIVE", "bottom-left"], ["THINKING DEPTH", "LEVEL 08", "bottom-right"]] as const;
+const readouts = [
+  { pos: "top-left", label: "NEURAL NETWORK", lines: ["Synapses Active", "12.5B"] },
+  { pos: "top-right", label: "DATA FLOW", lines: ["2.48 TB/s"] },
+  { pos: "bottom-left", label: "LEARNING MODE", lines: ["Continuous"] },
+  { pos: "bottom-right", label: "THINKING DEPTH", lines: ["Maximum"] },
+] as const;
+
+const messages = [
+  { role: "M", name: "Michał", text: "Hej Hades", time: "05:52", cls: "user" },
+  { role: "H", name: "HADES", text: "Dzień dobry Michał. W czym mogę pomóc?", time: "05:53", cls: "hades" },
+] as const;
 
 export default function CenterPanel() {
   return (
     <section className="center-panel" aria-label="Hades AI core">
-      <div className="center-header"><div><span className="core-kicker">CENTRAL INTELLIGENCE / NODE 01</span><div className="center-title">HADES</div></div><div className="center-status">● SYNCHRONIZED</div></div>
       <div className="brain-wrapper">
         <BrainCore />
-        <div className="core-crosshair" aria-hidden="true" />
-        {telemetry.map(([label, value, position]) => <div className={`floating-readout ${position}`} key={label}><span>{label}</span><strong>{value}</strong><i /></div>)}
+        {readouts.map((r) => (
+          <div className={`floating-readout ${r.pos}`} key={r.label}>
+            <span>{r.label}</span>
+            {r.lines.map((line) => <strong key={line}>{line}</strong>)}
+          </div>
+        ))}
       </div>
-      <div className="center-footer"><div className="footer-box"><span>AI</span><strong>ONLINE</strong></div><div className="footer-box"><span>MEMORY</span><strong>SYNC</strong></div><div className="footer-box"><span>VOICE</span><strong>READY</strong></div><div className="footer-box"><span>NETWORK</span><strong>CONNECTED</strong></div></div>
+
+      <section className="conversation">
+        <div className="panel-title">CONVERSATION<span className="panel-dots">•••</span></div>
+        <div className="conversation-feed">
+          {messages.map((m) => (
+            <article className={`message ${m.cls}`} key={m.name}>
+              <span className={`avatar ${m.cls}`}>{m.role}</span>
+              <div className="bubble">
+                <div className="bubble-head"><b>{m.name}</b><time>{m.time}</time></div>
+                <p>{m.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="conversation-input">
+          <input type="text" placeholder="Napisz wiadomość..." aria-label="Message" />
+          <button type="button" aria-label="Send message"><Icon name="send" /></button>
+        </div>
+      </section>
     </section>
   );
 }

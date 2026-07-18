@@ -1,40 +1,70 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, OrbitControls } from "@react-three/drei";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
-import { useRef } from "react";
-import * as THREE from "three";
-import BrainGlow from "./BrainGlow";
-import BrainNetwork from "./BrainNetwork";
-import BrainParticles from "./BrainParticles";
-import BrainRings from "./BrainRings";
-import StatusHalo from "./StatusHalo";
+import type { CSSProperties } from "react";
+import brainHologram from "../../assets/brain-hologram-clean-v2.png";
 
-function LivingBrain() {
-  const group = useRef<THREE.Group>(null);
-  useFrame((state, delta) => {
-    if (!group.current) return;
-    const t = state.clock.elapsedTime;
-    group.current.rotation.y += delta * .012;
-    group.current.rotation.x = Math.sin(t * .48) * .014;
-    group.current.rotation.z = Math.sin(t * .37) * .006;
-    group.current.position.y = Math.sin(t * .74) * .01;
-  });
-  return <Float speed={.9} floatIntensity={.025} rotationIntensity={.004}><group ref={group}><BrainGlow /><BrainNetwork connections={3900} /><BrainParticles count={2800} radius={1.82} /></group></Float>;
-}
+const sparks = [
+  { left: "39%", top: "31%", dx: "36px", dy: "14px", delay: "0s" },
+  { left: "49%", top: "35%", dx: "-28px", dy: "25px", delay: "-0.7s" },
+  { left: "58%", top: "39%", dx: "31px", dy: "-18px", delay: "-1.4s" },
+  { left: "45%", top: "43%", dx: "42px", dy: "17px", delay: "-2.1s" },
+  { left: "54%", top: "47%", dx: "-35px", dy: "-20px", delay: "-2.8s" },
+  { left: "62%", top: "44%", dx: "-26px", dy: "29px", delay: "-3.5s" },
+] as const;
 
-function Scene() {
-  return <>
-    <ambientLight intensity={.08} />
-    <pointLight position={[0, 1.6, 2.8]} intensity={3.5} color="#aaf8ff" />
-    <pointLight position={[2.4, .2, 1.4]} intensity={2.8} color="#167cff" />
-    <pointLight position={[-2.5, -.5, .8]} intensity={1.7} color="#7650ff" />
-    <LivingBrain />
-    <BrainRings />
-    <StatusHalo />
-    <OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={.008} />
-  </>;
-}
+const electrons = [
+  { width: "61%", height: "25%", top: "43%", tilt: "4deg", duration: "5.8s", delay: "-1.1s", tone: "cyan", reverse: false },
+  { width: "61%", height: "25%", top: "43%", tilt: "4deg", duration: "5.8s", delay: "-3.9s", tone: "blue", reverse: false },
+  { width: "53%", height: "34%", top: "43%", tilt: "58deg", duration: "7.4s", delay: "-2.2s", tone: "violet", reverse: true },
+  { width: "53%", height: "34%", top: "43%", tilt: "58deg", duration: "7.4s", delay: "-5.6s", tone: "red", reverse: true },
+  { width: "47%", height: "39%", top: "43%", tilt: "116deg", duration: "9.2s", delay: "-4.5s", tone: "cyan", reverse: false },
+  { width: "47%", height: "39%", top: "43%", tilt: "116deg", duration: "9.2s", delay: "-7.8s", tone: "blue", reverse: false },
+  { width: "39%", height: "43%", top: "43%", tilt: "151deg", duration: "6.8s", delay: "-1.8s", tone: "violet", reverse: true },
+  { width: "39%", height: "43%", top: "43%", tilt: "151deg", duration: "6.8s", delay: "-5.1s", tone: "cyan", reverse: true },
+] as const;
 
 export default function BrainCore() {
-  return <Canvas gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }} camera={{ position: [0, 0, 5.15], fov: 38 }} dpr={[1, 2]}><Scene /><EffectComposer><Bloom intensity={.3} mipmapBlur luminanceThreshold={.72} luminanceSmoothing={.16} /></EffectComposer></Canvas>;
+  return (
+    <div className="brain-core-visual" aria-hidden="true">
+      <div className="brain-core-aura" />
+      <img className="brain-core-image" src={brainHologram} alt="" draggable={false} />
+      <img className="brain-rings-layer rings-clockwise" src={brainHologram} alt="" draggable={false} />
+      <img className="brain-rings-layer rings-counter" src={brainHologram} alt="" draggable={false} />
+      <img className="brain-base-rings-layer" src={brainHologram} alt="" draggable={false} />
+      <div className="brain-energy-wave wave-one" />
+      <div className="brain-energy-wave wave-two" />
+      <div className="brain-energy-wave wave-red" />
+      <div className="brain-orbit orbit-one"><i /><i /></div>
+      <div className="brain-orbit orbit-two"><i /><i /></div>
+      <div className="brain-orbit orbit-three"><i /><i /></div>
+      {electrons.map((electron, index) => (
+        <span
+          className={`brain-electron-track ${electron.reverse ? "reverse" : ""}`}
+          key={`electron-${index}`}
+          style={{
+            "--track-width": electron.width,
+            "--track-height": electron.height,
+            "--track-top": electron.top,
+            "--track-tilt": electron.tilt,
+            "--track-duration": electron.duration,
+            animationDelay: electron.delay,
+          } as CSSProperties}
+        >
+          <i className={`brain-electron ${electron.tone}`} />
+        </span>
+      ))}
+      <div className="brain-core-scan" />
+      {sparks.map((spark, index) => (
+        <span
+          className="brain-core-spark"
+          key={index}
+          style={{
+            left: spark.left,
+            top: spark.top,
+            animationDelay: spark.delay,
+            "--spark-x": spark.dx,
+            "--spark-y": spark.dy,
+          } as CSSProperties}
+        />
+      ))}
+    </div>
+  );
 }

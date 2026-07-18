@@ -2,16 +2,24 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 
-function HaloRing({ inner, outer, color, speed, opacity }: { inner: number; outer: number; color: string; speed: number; opacity: number }) {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame((state, delta) => {
-    if (!ref.current) return;
-    ref.current.rotation.z += speed * delta;
-    const pulse = 1 + Math.sin(state.clock.elapsedTime * .8) * .006;
-    ref.current.scale.setScalar(pulse);
-  });
-  return <mesh ref={ref}><ringGeometry args={[inner, outer, 192]} /><meshBasicMaterial color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>;
-}
+// Holographic circular field framing the brain (dark interior, thin outline).
 export default function StatusHalo() {
-  return <><HaloRing inner={2.34} outer={2.348} color="#38dfff" speed={.035} opacity={.1} /><HaloRing inner={2.57} outer={2.576} color="#697eff" speed={-.022} opacity={.065} /></>;
+  const ring = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (!ring.current) return;
+    const material = ring.current.material as THREE.MeshBasicMaterial;
+    material.opacity = .3 + Math.sin(state.clock.elapsedTime * .9) * .06;
+  });
+  return <group position={[0, -.05, -.4]}>
+    {/* crisp outer ring */}
+    <mesh ref={ring}>
+      <ringGeometry args={[1.5, 1.514, 160]} />
+      <meshBasicMaterial color="#3fbcff" transparent opacity={.3} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
+    {/* soft inner ring */}
+    <mesh>
+      <ringGeometry args={[1.36, 1.366, 160]} />
+      <meshBasicMaterial color="#2f8fff" transparent opacity={.1} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
+  </group>;
 }
