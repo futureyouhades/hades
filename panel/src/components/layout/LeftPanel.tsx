@@ -1,4 +1,5 @@
 import Icon from "../ui/Icon";
+import type { VoiceState } from "../../types/voice";
 
 const systemStats = [
   ["core", "Core", 100],
@@ -8,9 +9,24 @@ const systemStats = [
   ["aiengine", "AI Engine", 100],
 ] as const;
 
-const bars = Array.from({ length: 28 }, (_, i) => 6 + Math.abs(Math.sin(i * 1.7)) * 26);
+const barSeeds = Array.from({ length: 28 }, (_, index) => Math.abs(Math.sin(index * 1.7)));
 
-export default function LeftPanel() {
+interface Props {
+  voiceState: VoiceState;
+  voiceLevel: number;
+  error: string | null;
+  onToggleVoice: () => void;
+}
+
+const captions: Record<VoiceState, string> = {
+  idle: "Kliknij mikrofon",
+  listening: "Słucham...",
+  thinking: "Myślę...",
+  speaking: "Mówię...",
+  error: "Sprawdź mikrofon",
+};
+
+export default function LeftPanel({ voiceState, voiceLevel, error, onToggleVoice }: Props) {
   return (
     <aside className="side-panel left-panel">
       <section className="hud-panel">
@@ -43,10 +59,13 @@ export default function LeftPanel() {
 
       <section className="hud-panel">
         <div className="panel-title">VOICE STATUS<span className="panel-dots">•••</span></div>
-        <div className="panel-body voice-body">
-          <div className="voice-mic"><Icon name="mic" /></div>
-          <div className="voice-wave">{bars.map((h, i) => <span key={i} style={{ height: `${h}px` }} />)}</div>
-          <div className="voice-caption">Listening...</div>
+        <div className={`panel-body voice-body voice-${voiceState}`}>
+          <button type="button" className="voice-mic" onClick={onToggleVoice} aria-label={voiceState === "listening" ? "Zatrzymaj nasłuchiwanie" : "Uruchom mikrofon"}><Icon name="mic" /></button>
+          <div className="voice-wave">{barSeeds.map((seed, index) => {
+            const activeLevel = voiceState === "idle" || voiceState === "error" ? 0.08 : Math.max(0.12, voiceLevel);
+            return <span key={index} style={{ height: `${5 + activeLevel * (10 + seed * 31)}px` }} />;
+          })}</div>
+          <div className="voice-caption">{error || captions[voiceState]}</div>
         </div>
       </section>
     </aside>

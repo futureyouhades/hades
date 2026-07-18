@@ -1,0 +1,20 @@
+[Unit]
+Description=HADES AI API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=hades
+Group=hades
+WorkingDirectory=/opt/hades
+Environment=NODE_ENV=production
+EnvironmentFile=-/opt/hades/.env
+ExecStart=/usr/bin/node /opt/hades/dist/server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

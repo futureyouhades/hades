@@ -1,5 +1,8 @@
 import BrainCore from "../core/BrainCore";
 import Icon from "../ui/Icon";
+import { useState } from "react";
+import type { FormEvent } from "react";
+import type { ChatMessage, VoiceState } from "../../types/voice";
 
 const readouts = [
   { pos: "top-left", label: "NEURAL NETWORK", lines: ["Synapses Active", "12.5B"] },
@@ -8,16 +11,29 @@ const readouts = [
   { pos: "bottom-right", label: "THINKING DEPTH", lines: ["Maximum"] },
 ] as const;
 
-const messages = [
-  { role: "M", name: "Michał", text: "Hej Hades", time: "05:52", cls: "user" },
-  { role: "H", name: "HADES", text: "Dzień dobry Michał. W czym mogę pomóc?", time: "05:53", cls: "hades" },
-] as const;
+interface Props {
+  voiceState: VoiceState;
+  voiceLevel: number;
+  transcript: string;
+  messages: ChatMessage[];
+  onSendMessage: (text: string) => Promise<void>;
+}
 
-export default function CenterPanel() {
+export default function CenterPanel({ voiceState, voiceLevel, transcript, messages, onSendMessage }: Props) {
+  const [input, setInput] = useState("");
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    void onSendMessage(text);
+  };
+
   return (
     <section className="center-panel" aria-label="Hades AI core">
       <div className="brain-wrapper">
-        <BrainCore />
+        <BrainCore voiceState={voiceState} voiceLevel={voiceLevel} />
         {readouts.map((r) => (
           <div className={`floating-readout ${r.pos}`} key={r.label}>
             <span>{r.label}</span>
@@ -29,20 +45,21 @@ export default function CenterPanel() {
       <section className="conversation">
         <div className="panel-title">CONVERSATION<span className="panel-dots">•••</span></div>
         <div className="conversation-feed">
-          {messages.map((m) => (
-            <article className={`message ${m.cls}`} key={m.name}>
-              <span className={`avatar ${m.cls}`}>{m.role}</span>
+          {messages.slice(-4).map((message) => (
+            <article className={`message ${message.role}`} key={message.id}>
+              <span className={`avatar ${message.role}`}>{message.role === "user" ? "M" : "H"}</span>
               <div className="bubble">
-                <div className="bubble-head"><b>{m.name}</b><time>{m.time}</time></div>
-                <p>{m.text}</p>
+                <div className="bubble-head"><b>{message.name}</b><time>{message.time}</time></div>
+                <p>{message.text}</p>
               </div>
             </article>
           ))}
+          {transcript && <div className="live-transcript">„{transcript}”</div>}
         </div>
-        <div className="conversation-input">
-          <input type="text" placeholder="Napisz wiadomość..." aria-label="Message" />
-          <button type="button" aria-label="Send message"><Icon name="send" /></button>
-        </div>
+        <form className="conversation-input" onSubmit={submit}>
+          <input value={input} onChange={(event) => setInput(event.target.value)} type="text" placeholder="Napisz wiadomość..." aria-label="Wiadomość" disabled={voiceState === "thinking"} />
+          <button type="submit" aria-label="Wyślij wiadomość" disabled={!input.trim() || voiceState === "thinking"}><Icon name="send" /></button>
+        </form>
       </section>
     </section>
   );

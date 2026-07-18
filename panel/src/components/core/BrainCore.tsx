@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import brainHologram from "../../assets/brain-hologram-clean-v2.png";
+import type { VoiceState } from "../../types/voice";
 
 const sparks = [
   { left: "39%", top: "31%", dx: "36px", dy: "14px", delay: "0s" },
@@ -21,9 +22,9 @@ const electrons = [
   { width: "39%", height: "43%", top: "43%", tilt: "151deg", duration: "6.8s", delay: "-5.1s", tone: "cyan", reverse: true },
 ] as const;
 
-export default function BrainCore() {
+export default function BrainCore({ voiceState, voiceLevel }: { voiceState: VoiceState; voiceLevel: number }) {
   return (
-    <div className="brain-core-visual" aria-hidden="true">
+    <div className={`brain-core-visual voice-${voiceState}`} style={{ "--voice-level": voiceLevel } as CSSProperties} aria-hidden="true">
       <div className="brain-core-aura" />
       <img className="brain-core-image" src={brainHologram} alt="" draggable={false} />
       <img className="brain-rings-layer rings-clockwise" src={brainHologram} alt="" draggable={false} />
